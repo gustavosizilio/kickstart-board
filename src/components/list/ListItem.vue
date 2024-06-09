@@ -1,39 +1,31 @@
 <template>
-  <div class="relative p-1.5 mb-32 ml-3 w-list bg-gray2 rounded shadow-md" data-cy="list" @dragenter="isDragging = true" @dragleave="isDragging = false">
+  <div class="relative p-1.5 mb-32 ml-3 w-list bg-gray2 rounded shadow-md" data-cy="list" @dragenter="isDragging = true"
+    @dragleave="isDragging = false">
     <div class="flex mb-1">
-      <input
-        v-click-away="onClickAway"
+      <input v-click-away="onClickAway"
         class="inline-block flex-grow py-0.5 px-1 h-8 text-sm font-semibold text-gray-900 bg-gray2 focus:bg-gray1 rounded-sm border-2 border-transparent focus:border-blue6 outline-none cursor-pointer"
-        data-cy="list-name"
-        :value="list.name"
-        @mouseup="
+        data-cy="list-name" :value="list.name" @mouseup="
           selectInput($event);
-          inputActive = true;
-        "
-        @change="patchList(list, { name: inputValue($event) })"
-        @keyup.enter="
+        inputActive = true;
+        " @change="patchList(list, { name: inputValue($event) })" @keyup.enter="
           blurInput($event);
-          inputActive = false;
-        "
-        @blur="inputActive = false"
-      />
+        inputActive = false;
+        " @blur="inputActive = false">
       <ListOptions :list="list" @toggle-input="showCardCreate" />
     </div>
     <div data-cy="card-list" :class="isDragging ?? 'min-h-[100px]'">
       <div v-if="loadingListCards[list.id]" class="block place-self-center text-xs text-center">
         <LoadingIcon class="inline-block mb-1" />&nbsp;&nbsp;Loading cards ...
       </div>
-      <draggable :list="list.cards" animation="150" group="cards" ghost-class="bg-gray2" :item-key="list.name" @change="sortCards">
+      <draggable :list="list.cards" animation="150" group="cards" ghost-class="bg-gray2" :item-key="list.name"
+        @change="sortCards">
         <template #item="{ element }">
           <CardItem :card="element" />
         </template>
       </draggable>
-      <div
-        v-if="!cardCreate"
+      <div v-if="!cardCreate"
         class="py-1.5 px-2 text-sm font-normal text-gray-500 hover:text-gray-600 hover:bg-gray4 rounded-md cursor-pointer"
-        data-cy="new-card"
-        @click="showCardCreate(true)"
-      >
+        data-cy="new-card" @click="showCardCreate(true)">
         <Plus class="inline-block w-3 h-3" />Add another card
       </div>
       <CardCreateInput v-else :list="list" @toggle-input="showCardCreate" />
@@ -76,10 +68,13 @@ const showCardCreate = (flag: boolean) => {
 };
 const sortCards = () => {
   // find list index of dragged card(s)
-  const listIndex = lists.value.find((l: List) => l.id === props.list.id);
-  // trigget PATCH request for every car that was dragged
-  lists.value[listIndex].cards.forEach((card: Card, order: Card['order']) => {
-    patchCard(card, { listId: props.list.id, order });
-  });
+  const listIndex = lists.value.findIndex((l: List) => l.id === props.list.id);
+
+  if (listIndex !== -1) {
+    // trigget PATCH request for every car that was dragged
+    lists.value[listIndex].cards.forEach((card: Card, order: Card['order']) => {
+      patchCard(card, { listId: props.list.id, order });
+    });
+  }
 };
 </script>
